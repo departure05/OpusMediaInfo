@@ -36,7 +36,7 @@ Then install the script as usual. (Required at least DOpus v13.21.1).
 
 <a name="release">Latest version</a> : [Download from here](https://github.com/departure05/OpusMediaInfo/releases/download/latest/OpusMediaInfo.opusscriptinstall)
 
-You can always find the latest version published [here](https://github.com/departure05/OpusMediaInfo).
+You can always find the latest version published here.
 
 ---
 
