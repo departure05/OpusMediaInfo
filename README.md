@@ -1,180 +1,261 @@
 # OpusMediaInfo
-All the MediaInfo data you can ask for Opus!
+All the MediaInfo data you could ever want in Opus!
 
-`OpusMediaInfo` is a script add‑in for [Directory Opus](https://www.gpsoft.com.au) that extends the default multimedia columns, letting you pull in any MediaInfo value right into Opus. What really sets it apart is its intuitive UI. No more manual edits just to add some columns. Just preview and pick exactly the data you need, then choose how it'll appear in Opus.
+`OpusMediaInfo` is a script add-in for [Directory Opus](https://www.gpsoft.com.au) that extends the default multimedia columns, letting you access any MediaInfo value directly in Opus. What really sets it apart is its intuitive UI. No more manual edits just to add columns. Simply preview and select the data you need, then choose how it should appear in Opus.
+
+> NOTE: Since v6.0, `OpusMediaInfo` has used its own Go-based helper and `MediaInfo.dll`.
+> Versions prior to v6.0 require [DOpusScriptingExtensions](https://github.com/PolarGoose/DOpus-Scripting-Extensions). Older versions are considered deprecated.
 
 #### **Key Features:**
 
 * Full support for virtually every property exposed by MediaInfo, including unofficial ones.
-* Easy to use. Just open the config dialog with a file, or drop a file in, pick the properties you want to add by their preview value, and you're good to go.
-* A built-in UI to manage which columns you want to add : customize the name, header, type, category, applicable extensions, and more.
-* Designed for both casual and advanced users: the interface is simple but powerful enough to define custom rules and formatting.
-* Supports both single-value and multi-stream outputs at runtime, no need to tweak the script manually.
-* Real-time preview of values in each property, as they'd appear in the file display.
-* Fully customizable [infotips](#infotips) with special entries that show results live.
-* Support for [custom columns](#custom-columns) that can take their value from multiple MediaInfo fields in a single column.
-* Easily switch data types on the fly.
-* Import/export your configuration easily.
-* Data can be retrieved very fast.
-* Support for regular Mediainfo CLI.
-* Support localization for values.
-* Built-in support for [caching values](#about-cache) based on a configurable file size, with automatic file change detection.
-* Dump Mediainfo data for desired files through different formats.
+* Easy to use. Just open the config dialog with a file, or drop a file into it, select the properties you want to add based on their preview values, and you're good to go.
+* A built-in UI for managing columns: customize their names, headers, types, categories, applicable extensions, and more.
+* Designed for both casual and advanced users: the interface is simple yet powerful enough to define custom rules and formatting.
+* Supports both single-value and multi-stream outputs at runtime, with no need to modify the script manually.
+* Real-time preview of each property's values as they would appear in the file display.
+* Fully customizable [infotips](#infotips), with special entries that display live results.
+* Support for [custom columns](#custom-columns) that can retrieve values from multiple MediaInfo fields in a single column.
+* Easily change data types on the fly.
+* Easy configuration import/export.
+* Very fast data retrieval.
+* Support for localized values.
+* Built-in support for [caching values](#database) through a SQlite database, based on a configurable file size, with automatic file change detection.
+* Dump MediaInfo data for selected files in various formats.
 * Much more...
 
-<img width="1500" height="812" alt="column_editor" src="https://github.com/user-attachments/assets/0888a0b4-1645-4c9c-abca-4b08b4647923" />
+<img width="1561" height="967" alt="editor" src="https://github.com/user-attachments/assets/4a4435c3-3346-4f0a-9cf6-af6573dabce2" />
+
+
+---
+
+#### **Requirements:**
+
+* Windows 10 1803 or higher (required for communication with the helper).
+* Directory Opus 13.25.4 or higher.
+* `MediaInfo.dll`.
+  - It's already included in the installer. You can also obtain it [here](https://mediaarea.net/en/MediaInfo/Download/Windows) (choose the 64-bit DLL version without the installer).
+  - Alternatively, if you already have it somewhere on your system, you can specify its path in Script Options.
+* If you need localization (for non-English users), place the corresponding `.csv` language files alongside the DLL or the helper. It's recommended to do this before the database starts being populated.
+  - Language files can be installed through the installer.
 
 ---
 
 #### **Installation:**
 
-This script fully support `DOpus-Scripting-Extensions` by @PolarGoose. First, you'll need to install the latest version from [here](https://github.com/PolarGoose/DOpus-Scripting-Extensions/releases).
-Additionally, you can also use the regular Mediainfo.exe CLI (including localization files), and put it in `/dopusdata\User Data\OpusMediaInfo`.
+This script comes with its own installer, which you can download [here](https://github.com/departure05/OpusMediaInfo/releases/download/latest/OpusMediaInfoInstaller.exe).
 
-Then install the script as usual. (Required at least DOpus v13.21.1).
+The installer will put the helper in place and automatically launch the script installation. Optionally, it can also copy `MediaInfo.dll` and the language files.
+
+If, for some reason, the installer cannot start the script installation, you can always find the latest `.opusscriptinstall` package and the helper [here](https://github.com/departure05/OpusMediaInfo/releases/download/latest).
+
+The first time you install the script, you'll be asked if you want to start configuring columns, assuming `MediaInfo.dll` is already set up correctly. If it isn't, the script will show you where to download it so you can continue.
+
+<img width="775" height="467" alt="welcome" src="https://github.com/user-attachments/assets/3ae30522-ffef-46c1-946b-ec4a526a82f5" />
 
 
-<a name="release">Latest version</a> : [Download from here](https://github.com/departure05/OpusMediaInfo/releases/download/latest/OpusMediaInfo.opusscriptinstall)
+Once you've placed `MediaInfo.dll` in the appropriate location, you're good to go.
 
-You can always find the latest version published here.
+Alternatively, you can open the `Script Management` window and set the path to your existing DLL under the `MediaInfo && DB` tab.
 
 ---
 
 #### **Columns Editor**
 
-The first time you install the script, it'll ask if you want to start configuring columns, assuming you already have MediaInfo set up correctly. If not, it'll give you some options to continue.
-
-<img width="646" height="267" alt="welcome" src="https://github.com/user-attachments/assets/2ea4f16d-650b-4808-b0cd-708b7b400967" />
-
-To configure which columns are enabled, you need to open the configuration dialog, which you can do in a few different ways:
+To configure which columns are enabled, open the configuration dialog in one of the following ways:
 
 * From the Script Management window, click the Configure button.
-* Using the `OpusMediaInfo CONFIG` command. You can also include the fullpath to a file you'd like to preview.
+* Run the `OpusMediaInfo CONFIG` command. You can also include the full path to a file you want to preview.
 
-The configuration dialog has two tabs : one for `column` settings and another for `infotips`.
+The configuration dialog has two tabs: one for column settings and another for infotips.
 
-When this dialog opens, if there's no columns enabled, you'll be asked to select a file so MediaInfo can fill in the list with values from its inform.
+When the dialog opens, if no columns are enabled, you'll be asked to select a file so MediaInfo can populate the list with values from its report.
 
-<img width="1500" height="812" alt="no_columns" src="https://github.com/user-attachments/assets/9f03f9c1-a7d2-4893-afd7-aa2656d0d9c0" />
+<img width="1930" height="827" alt="no_cols" src="https://github.com/user-attachments/assets/a7654668-3e44-4965-94da-396e56a12bac" />
 
-<img width="1500" height="812" alt="column_editor" src="https://github.com/user-attachments/assets/0888a0b4-1645-4c9c-abca-4b08b4647923" />
+Checked properties will be enabled as columns in Opus once you close the dialog.
 
-Checked properties are the ones that will be enabled as columns in Opus once you close the dialog.
+MediaInfo groups each field into one of the following categories: General, Video, Audio, Text, Menu, Image, and Other. Each property belongs to only one group, and properties with the same name can exist in different groups. Only properties in the "General" group have a single value; properties in other groups can have multiple values, one for each stream in the file.
 
-MediaInfo groups each field into one of the following: General, Video, Audio, Text, Menu, Image, and Other. Each property belongs to only one group, and there can be properties with the same name across different groups. Only properties in the "General" group have a single value; others can have multiple values, one for each stream in the file.
-Using the controls on the right, you can edit each column's label, header, type and so on.
+Use the controls on the right to edit each column's label, header, type, and other settings.
 
-The "Multiple" control lets you choose whether the column will show the property for each stream in the group, or just the first one. If "Multiple" is set to "True", the chosen separator will be used to split the values. The list has the "#" column, which shows how many values a given keyword has, useful for deciding its value.
+The **Multiple** control lets you choose whether the column displays the property for every stream in its group or only the first one. If **Multiple** is set to `True`, the selected separator will be used to join the values. The list includes a `#` column showing how many values a given keyword has, which is useful when deciding which properties to use.
 
-The "Type" control sets the data type of the column's content. Allowed types are: String (text), number (int), double, star (rating), datetime, date, time, duration, and size.
-You can change this value and immediately see how it affects the preview below.
-Note: When "Multiple" is **True**, the type is always treated as String, since it's best practice not to mix value types in a single column.
+The **Type** control sets the data type of the column's content. Allowed types are: String (text), number (int), double, star (rating), datetime, date, time, duration, and size.
 
-The "Category" control lets you change where the column appears. By default, columns are added under Script > OpusMediaInfo. You can switch this to any other category you prefer. This doesn't affect the behavior or output of the column.
+You can change the type and immediately see how it affects the preview below.
 
-The "Pattern" controls let you apply advanced formatting using regular expressions.
-By default, the script uses predefined formats to adjust the type of each value. You can override those with your own.
-The first field is where you define the actual pattern to match. Use the same format as ECMAScript literal regex: `/pattern/flags`.
-The second field defines the replacement string. Both follow the same format used in JScript's `String.replace(pattern, replace)`, so compatibility depends on that context.
+Note: When **Multiple** is set to `True`, the type is always treated as String, since mixing value types in a single column is not recommended.
 
-The listed extensions below are used to determine which files the column applies to.
-You can add file type groups using `grp:` followed by the internal or display name of the group.
-You can also list specific extensions (include the dot). Wildcards are not supported.
+The **Category** control lets you choose where the column appears. By default, columns are added under Script > OpusMediaInfo. You can change this to any category you prefer. This doesn't affect the column's behavior or output.
 
-Every time you open a file for preview, the script saves the listed properties for later use, so you don't have to remember which file had which properties when adding a new column.
+The **Pattern** controls let you apply advanced formatting using regular expressions.
 
-You can Export or Import columns from this same window, using the provided buttons.
+By default, the script uses predefined formats to adjust the type of each value, but you can override them with your own.
 
-<img width="721" height="265" alt="import_export" src="https://github.com/user-attachments/assets/5427ec50-4c42-4473-9849-900a2a1be755" />
+The first field defines the pattern to match. Use the same format as an ECMAScript regex literal: `/pattern/flags`.
 
-For keyboard navigation, the following hotkeys are active when the list is focused:
-<kbd>Ctrl</kbd>+<kbd>L</kbd>: Focuses the Label field
-<kbd>Ctrl</kbd>+<kbd>H</kbd>: Focuses the Header field
-<kbd>Ctrl</kbd>+<kbd>T</kbd>: Focuses the Type field
-<kbd>Ctrl</kbd>+<kbd>M</kbd>: Focuses the Multiple field
-<kbd>Ctrl</kbd>+<kbd>G</kbd>: Focuses the Category field
-<kbd>Ctrl</kbd>+<kbd>R</kbd>: Focuses the Pattern field
-<kbd>Ctrl</kbd>+<kbd>A</kbd>: Focuses the Alignment field
+The second field defines the replacement string. Both follow the format used by JScript's `String.replace(pattern, replace)`, so compatibility depends on that context.
+
+The extensions listed below determine which files the column applies to.
+
+You can add file type groups by entering `grp:` followed by the group's internal or display name.
+
+You can also list specific extensions (including the dot). Wildcards are not supported.
+
+Whenever you open a file for preview, the script saves the listed properties for later use, so you don't have to remember which file had which properties when adding a new column.
+
+You can export or import columns from this window using the provided buttons.
+
+You can also choose which columns should have their contents blurred when using Directory Opus's Secure Screenshot feature.
+
+For keyboard navigation, the following hotkeys are available when the list has focus:
+
+- <kbd>Ctrl</kbd>+<kbd>L</kbd>: Focuses the Label field.
+- <kbd>Ctrl</kbd>+<kbd>H</kbd>: Focuses the Header field.
+- <kbd>Ctrl</kbd>+<kbd>T</kbd>: Focuses the Type field.
+- <kbd>Ctrl</kbd>+<kbd>M</kbd>: Focuses the Multiple field.
+- <kbd>Ctrl</kbd>+<kbd>G</kbd>: Focuses the Category field.
+- <kbd>Ctrl</kbd>+<kbd>R</kbd>: Focuses the Pattern field.
+- <kbd>Ctrl</kbd>+<kbd>A</kbd>: Focuses the Alignment field.
 
 You can also press <kbd>F3</kbd> to move focus to the Filter field.
 
-After closing the dialog, the columns will be added automatically and will be ready to use in Opus, in any field where they apply.
+Press <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>T</kbd> to toggle the window's always-on-top status (only when opened via the command).
+
+After you close the dialog, the columns will be added automatically and will be ready to use in Opus wherever they apply.
+
 Note: If the columns are already visible, you may need to refresh the lister to see the changes.
-
-
-You can also access the Options dialog from here, which lets you configure things like the script log level, the separator used for multiple values, and settings related to [cache usage](#about-cache).
-
-<img width="802" height="417" alt="options" src="https://github.com/user-attachments/assets/79ae1ea7-9e17-49be-858e-69093a2b085a" />
-
-(This dialog is also accesible from the Script Management window, by clicking the About button).
 
 ---
 
-### Infotips
+#### **Options Window**
 
-<img width="1500" height="812" alt="infotips" src="https://github.com/user-attachments/assets/ed41538f-0c95-4702-aa64-db44429a94e8" />
+You can access the Options dialog from here to configure settings such as the script log level, the separator used for multiple values, and options related to [cache usage](#about-cache).
 
-You can create custom infotips for each group and then simply reference them in Opus using their specific keyword.
-Available infotips are for: General, Audio, Video, Text, Menu, and Image.
+<img width="1057" height="642" alt="options1" src="https://github.com/user-attachments/assets/90ccc10c-4769-4376-bb34-c785389b076e" />
 
-When building infotips, to get the keyword you want, select it from the list and press <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy it to the clipboard.
-Infotips use a special syntax, which basically works like this:
+<img width="1057" height="642" alt="options2" src="https://github.com/user-attachments/assets/4ddcd8ac-61de-406f-b9c7-a92afba93620" />
+
+
+(This dialog is also accessible from the Script Management window by clicking the About button.)
+
+---
+
+### **Infotips**
+
+<img width="1561" height="967" alt="infotips" src="https://github.com/user-attachments/assets/88597f82-4eeb-4c2d-aff3-94e8676dbbf9" />
+
+You can create custom infotips for each group and then reference them in Opus using their respective keywords.
+
+Available infotip groups are: General, Audio, Video, Text, Menu, and Image.
+
+To get the keyword you need when building infotips, select it from the list and press <kbd>Ctrl</kbd>+<kbd>C</kbd> to copy it to the clipboard.
+
+Infotips use a special syntax that works as follows:
 
 ```
-{keyword|value if not available|specific format}
+{keyword|value if not available|simple format|conversion/format as}
 ```
 
-Where parts 2 and 3 are optional.
-The specific format expects "%1" to insert the keyword's value in the desired position.
-If the keyword doesn't exist, or the text isn't inside {}, the text is passed as is.
-These values support all the markup code that Opus allows.
+Parts 2, 3, and 4 are optional.
+
+The simple format uses `%1` as a placeholder for inserting the keyword's value at the desired position.
+
+If the keyword doesn't exist, or the text isn't enclosed in `{}`, the text is passed through unchanged.
+
+These values support all markup codes allowed by Opus.
+
+For `conversion/format as`, you can use the same logic as the Evaluator's [As function](https://docs.dopus.com/doku.php?id=reference:evaluator:as) to convert values to specific types.
+
+For example, `{File_Created_Date||Created: %1|date}` uses the fourth part to convert the value to the date type, using the local date format.
 
 ---
 
 ### **Custom Columns**
 
-Since v2.0.0, you can create custom columns that pull values from multiple MediaInfo fields. You can pick multiple MediaInfo fields and order them so the script takes the first value found and shows it as the column value. That way you can have a single column that groups several sources and adapts depending on the file. For example, you can create a column that shows the width of the first video stream for video files, and the image width for image files. There are lots of possibilities.
+You can create custom columns that retrieve values from multiple fields. Select multiple MediaInfo fields and arrange them in the desired order. The script will use the first value it finds as the column's value.
 
-These columns have the same customization options as the others (type, multiple or not, etc.). The only difference is that their value can depend on multiple fields instead of just one.
+This lets you create a single column that combines multiple sources and adapts to the file type. For example, you could create a column that displays the width of the first video stream for video files and the image width for image files. The possibilities are extensive.
 
-To create them, press the "Custom" button in the main UI. That opens a dialog that asks for the name (keyword) of the new column and lets you pick the fields to pull data from and define the processing order.
+Custom columns have the same customization options as regular columns (type, Multiple, etc.). The only difference is that their values can come from multiple fields rather than a single one.
 
-<img width="1500" height="812" alt="custom_column" src="https://github.com/user-attachments/assets/908d421e-a113-45c5-8ba1-cdee421366f3" />
+To create a custom column, click the **Custom** button in the main UI. This opens a dialog where you can enter the new column's name (keyword), select the fields to retrieve values from, and define their processing order.
 
-You can also edit existing custom columns using the "Edit..." button. (Only appears when a Custom column is selected).
+<img width="829" height="824" alt="custom_column" src="https://github.com/user-attachments/assets/0120f374-a813-43fa-842d-681c0c69b966" />
 
----
-
-#### **Command's Arguments**
-
-The command support the following arguments:
-
-| Argument | Type | Value | Desc |
-|----|----|----|----|
-| **CONFIG** | /O |  | Shows the dialog windows for configuring columns/infotips. |
-|  |  | *filepath* | Accepts a filepath to populate the preview column right after start. |
-| **EXPORT** | /S |  | Exports columns/infotips to a file. |
-| **IMPORT** | /O |  | Imports columns/infotips from a file without deleting existing ones. If no file is specified, you'll be prompted to choose one. |
-| **!IMPORT** | /O |  | Imports columns/infotips from a file, deleting existing ones. If no file is specified, you'll be prompted to choose one. |
-| **DUMP** | /M/O |  | Save the MediaInfo report for the chosen items to a file. You can pass multiple filenames separated by spaces (use commas if a filename contains a space). If no files are passed, the command will use the selected items in the source folder.|
-| **AS** | /K |  | Used together with `DUMP`, this lets you specify the output format. Valid values are: json,xml,txt,csv,html.|
-| **TO** | /K |  | Used together with `DUMP`, this lets you specify the outpath path.|
-| **PURGEDB** | /O |  | Performs a database cleanup, if applicable.|
-|  |  | *path/wildcard* | If a text value is specified, it can be the full name of a specific file or a path with * and ? wildcard support. If no value is specified, it removes all values for non-existing items (`KEEPMISSINGDRIVES` can change this behavior). |
-| **KEEPMISSINGDRIVES** | /S |  | Used together with `PURGEDB` (without a specified value), it allows you to keep missing entries that are located on unavailable drives (e.g. on an external disk).|
-| **VACUUM** | /S |  | Compacts the database. Use together with `PURGEDB`.|
+You can also edit existing custom columns using the **Edit...** button, which appears only when a custom column is selected.
 
 ---
 
-#### **Importing from a file**
+### **Database**
 
-The command supports importing columns directly from a valid JSON file encoded with UTF-8 NOBOM, with the following format:
+This script optionally uses an SQLite database for caching. It includes built-in support for storing data extracted by MediaInfo in a database so that subsequent requests can retrieve it quickly and efficiently.
+
+Caching is enabled by default and can be configured in the Options window, accessible from the Column Editor or by clicking the About button in Opus Script Management.
+
+You can also specify the minimum file size for files whose data should be read and stored in the database.
+
+Additionally, you can choose whether caching should be available when Opus is running from a USB export.
+
+You can also define exclusions using wildcards to ignore certain files and prevent them from being added to the database.
+
+The script automatically determines whether a file's data needs to be updated using several metrics, including file size, modification date, and quick hash. This process is transparent to the user.
+
+The script also provides commands for database maintenance and cleanup.
+
+---
+
+### **Cleaning the Database**
+
+You can clean up the database using several command arguments provided by the script.
+
+If you use `PURGEDB` with a wildcard (`*`, `?`) or without a value, the script searches for orphaned database entries, depending on the other arguments used. A list of matching files will be displayed, allowing you to choose which entries to delete and which to keep.
+
+<img width="858" height="762" alt="purge_select" src="https://github.com/user-attachments/assets/2811af84-6ee4-49b5-b8b8-03df0db394b1" />
+
+If you use it along with `FILES`, you can remove specific entries from the database in a more direct way.
+
+<img width="785" height="659" alt="purge_files" src="https://github.com/user-attachments/assets/e3ef01ab-7154-4071-b6fd-1c8cf0ca4496" />
+
+
+You can also include `VACUUM` to compact the database.
+
+
+---
+
+#### **Command Arguments**
+
+The command supports the following arguments:
+
+| Argument | Type | Value | Description |
+| --- | --- | --- | --- |
+| **CONFIG** | /O | | Displays the configuration dialog for columns and infotips. |
+| | | *filepath* | Accepts a file path to populate the column preview immediately after startup. |
+| **EXPORT** | /S | | Exports columns and infotips to a file. |
+| **IMPORT** | /O | | Imports columns and infotips from a file without deleting existing entries. If no file is specified, you'll be prompted to choose one. |
+| **!IMPORT** | /O | | Imports columns and infotips from a file, deleting existing entries. If no file is specified, you'll be prompted to choose one. |
+| **DUMP** | /M/O | | Saves the MediaInfo report for the specified items to a file. You can pass multiple filenames separated by spaces (use commas if a filename contains spaces). If no files are specified, the command uses the selected items in the source folder. |
+| **AS** | /K | | Used with `DUMP` to specify the output format. Valid values are `json`, `xml`, `txt`, `csv`, and `html`. |
+| **TO** | /K | | Used with `DUMP` to specify the output path. |
+| **PURGEDB** | /O | | Performs database cleanup, if applicable. |
+| | | *path/wildcard* | If a text value is specified, it can be the full name of a specific file or a path containing `*` and `?` wildcards. If omitted, all entries for non-existing items are removed (`KEEPMISSINGDRIVES` can change this behavior). |
+| **KEEPMISSINGDRIVES** | /S | | Used with `PURGEDB` without a specified value to keep entries located on unavailable drives, such as external disks. |
+| **VACUUM** | /S | | Compacts the database. Use together with `PURGEDB`. |
+| **FILES** | /M | | Used with `PURGEDB` to specifically delete files from the database. |
+| **NOONTOP** | /S | | Used with `CONFIG` to prevent the window from opening on top (the default). |
+
+---
+
+#### **Importing from a File**
+
+The command supports importing columns directly from a valid JSON file encoded in UTF-8 without a BOM, using the following format:
 
 <details>
 
 There are two sections: **"columns"** and **"infotips"**.
 
-Each entry (KEY) in both groups must have the following properties:
+Each entry (key) in both sections must have the following properties:
 
 * **"label"**: Cannot be empty.
 * **"header"**:
@@ -183,9 +264,10 @@ Each entry (KEY) in both groups must have the following properties:
 * **"category"**: Must be `music`, `movie`, `image`, `script`, `size`, `std`, `date`, or `sums`.
 * **"enabled"**: Must be `1` or `0`.
 * **"exts"**: Cannot be empty; must include at least one `.` or `grp:`. Multiple values are separated by `; `.
-* **"group"**: Must be `General`, `Audio`, `Video`, `Image`, `Text`, `Menu`, `Other` or `Custom`.
+* **"group"**: Must be `General`, `Audio`, `Video`, `Image`, `Text`, `Menu`, `Other`, or `Custom`.
 * **"keyword"**: Cannot be empty (except for infotips).
 * **"multi"**: Must be `true` or `false`.
+* **"blurrable"**: Must be `true` or `false`.
 * **"regex"**: The regex used for custom formatting.
 * **"regex1"**: The regex flags.
 * **"regex2"**: The replacement value for the regex.
@@ -193,84 +275,79 @@ Each entry (KEY) in both groups must have the following properties:
 
 Additionally:
 
-* **KEY** must follow the internal format for columns (`group_keyword`) or infotips (`group_infotip`).
+* The key must follow the internal format for columns (`group_keyword`) or infotips (`group_infotip`).
 
-E.g.
+For example:
+
 ```json
 {
-	"columns": {
-		"Audio_Default": {
-			"label": "Audio Default",
-			"header": "Default",
-			"align": "left",
-			"type": "string",
-			"category": "script",
-			"enabled": 1,
-			"exts": "grp:Video",
-			"group": "Audio",
-			"keyword": "Default",
-			"multi": true,
-			"regex": "",
-			"regex1": "",
-			"regex2": ""
-		}
-	},
-	"infotips": {
-		"General_infotip": {
-			"label": "General_infotip",
-			"header": "General_infotip",
-			"align": "left",
-			"type": "string",
-			"category": "script",
-			"enabled": 1,
-			"exts": "grp:Music; grp:Movies; grp:Images",
-			"group": "General",
-			"keyword": "",
-			"multi": true,
-			"regex": "",
-			"regex1": "",
-			"regex2": "",
-			"value": "{FileSize_String||Size: %1},{OverallBitRate_String|| Bitrate: %1}{Duration_String||, Duration: %1} {File_Created_Date||Created: %1} {Encoded_Date||Encoded: %1} {Released_Date||Released: %1}"
-		}
-	}
+    "columns": {
+        "Audio_Default": {
+            "label": "Audio Default",
+            "header": "Default",
+            "align": "left",
+            "type": "string",
+            "category": "script",
+            "enabled": 1,
+            "exts": "grp:Video",
+            "group": "Audio",
+            "keyword": "Default",
+            "multi": true,
+            "blurrable": false,
+            "regex": "",
+            "regex1": "",
+            "regex2": ""
+        }
+    },
+    "infotips": {
+        "General_infotip": {
+            "label": "General_infotip",
+            "header": "General_infotip",
+            "align": "left",
+            "type": "string",
+            "category": "script",
+            "enabled": 1,
+            "exts": "grp:Music; grp:Movies; grp:Images",
+            "group": "General",
+            "keyword": "",
+            "multi": true,
+            "regex": "",
+            "regex1": "",
+            "regex2": "",
+            "value": "{FileSize_String||Size: %1},{OverallBitRate_String|| Bitrate: %1}{Duration_String||, Duration: %1} {File_Created_Date||Created: %1} {Encoded_Date||Encoded: %1} {Released_Date||Released: %1}"
+        }
+    }
 }
 ```
+
 </details>
 
 ---
 
-#### **About cache**
+#### **Notes**
 
-Since v4.0, the script includes optional built-in support that allows you to store data extracted with MediaInfo in a database, so when you need it again, it can be retrieved easily and much faster.
-This option is enabled by default and can be changed from the Options window, accessible from the Column Editor or by pressing the About button in the Opus Script Management.
-To use this feature, you need to have the [Microsoft Access Database Engine](https://www.microsoft.com/en-us/download/details.aspx?id=54920) installed, which usually comes with Microsoft Office.
-If the script detects that the engine is not installed, you will not be able to enable or use this optional feature.
-Additionally, you can decide the minimum file size for files whose data will be read and stored in the database.
-You can also decide whether this option should be available when Opus is running from a USB export.
-There is also be a way to define exclusions with wildcard support, so you can ignore certain files and prevent them from being added to the database.
-
-<img width="802" height="417" alt="mi_database_options" src="https://github.com/user-attachments/assets/0550707a-6744-4dbc-87a9-f178c4173533" />
-
----
-
-#### **Notes:**
-
-* Starting with version 16.0 of `DOpus-Scripting-Extensions`, unit values and certain words will be displayed in the same language Opus is running in.
-* The script adds certain values to the "Menu" group for convenience: `ChaptersCount` and `ChaptersList`.
-* The script adds the field `Dimensions` for every stream in the "Video" and "Image" groups. (Its value is `Height` x `Width` x `Bitdepth`)
-* Starting with v4.2, the script adds some common predefined columns with suggested file types. Feel free to edit them, and you can still add more entries to the list whenever you drop a file into it.
-* Since v3.0.0, conformance tags are supported. You can find the total count for all conformance issues in `General_ConformanceErrors` and `General_ConformanceWarnings`. This data can be very useful for finding damaged multimedia files or files that have some kind of issue.
-* You can access to the Options dialog by clicking the About button from the Script Management window.
-* For the database cache feature, the script can automatically detect most file changes and update their values in the database by using a file sampling technique that performs micro MD5 checksums. Note that for some plain text files, this technique may fail to detect changes.
-* Columns with the same label will be modified internally to avoid duplicates.
-* Custom columns can't be used for other custom columns or infotips.
-* When using `OpusMediaInfo PURGEDB`, note that some paths (e.g., slow remote ones) may take longer to be checked for existence. During this time, the database will not be available.
+* The script adds certain values for convenience: `Dimensions`, `ChaptersCount`, and `ChaptersList`.
+* The script includes some common predefined columns with suggested file types. Feel free to edit them, and you can add more entries to the list whenever you drop a file into it.
+* Conformance tags are supported. You can find the total count of all conformance issues in `General_ConformanceErrors` and `General_ConformanceWarnings`. This information can be useful for identifying damaged multimedia files or files with other issues.
+* For database caching, the script can automatically detect most file changes and update the stored values using a file-sampling technique that performs micro MD5 checksums. Note that this technique may fail to detect changes in some plain-text files.
+* Columns with duplicate labels will be renamed internally to avoid conflicts.
+* Custom columns cannot be used in other custom columns or infotips.
+* When using `OpusMediaInfo PURGEDB`, note that checking whether certain paths exist (e.g., slow remote paths) may take longer. During this time, no other operations will be available.
+* When the database is enabled, the script includes and populates two additional columns: `Stored` (a Boolean property indicating whether the file has data in the database) and `Last Saved` (the date the file was added to or updated in the database).
+* The database stores paths using the volume GUID instead of the drive letter. This is particularly useful for files on removable or USB drives, which are prone to changing drive letters.
 
 ---
 
-#### **Acknowledgments/Credits:**
+#### **Acknowledgments/Credits**
 
-* [MediaInfo](https://mediaarea.net/SupportUs).
-* [@PolarGoose](https://github.com/PolarGoose), for the awesome plugin that makes this project possible.
-* Main icon adapted from [The Mightiest Icons on the Web](https://glyphs.fyi)
-* Opus devs, for an amazing program that goes beyond a file manager.
+* This product uses the MediaInfo library, Copyright (c) 2002–2026 MediaArea.net SARL. [Website](https://mediaarea.net).
+* Main icon adapted from [The Mightiest Icons on the Web](https://glyphs.fyi).
+* The Opus developers, for creating an amazing program that goes far beyond a file manager.
+
+The Go helper uses the following third-party libraries:
+
+* `github.com/goccy/go-json`
+* `github.com/mattn/go-sqlite3`
+* `golang.org/x/sys`
+
+You can find the latest version and updates [here](https://github.com/departure05/OpusMediaInfo).
